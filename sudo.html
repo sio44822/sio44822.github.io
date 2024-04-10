@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #container {
+            display: flex;
+            max-width: 1500px;
+            /* width: 100dvw; */
+            margin: 3rem auto;
+            flex-direction: column;
+
+
+        }
+
+        button {
+            width: 6rem;
+            height: 2rem;
+            border-radius: 1rem;
+            margin: 1rem auto;
+        }
+
+        input[type="text"] {
+            width: 6rem;
+            height: 2rem;
+            margin: 0rem auto;
+            text-align: center;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="container" class="b">
+        <div id="board" style="margin:0px auto">
+
+        </div>
+
+        <!-- <button onclick="drawBoard(sudokuBoard);">drawBoard</button> -->
+        <!-- <button onclick="modBoard();">modBoard</button> -->
+        <!-- <button onclick="solveSudoku(sudokuBoard);">solveBoard</button> -->
+        <button onclick="Solveit()">Solve it!</button>
+        <button onclick="Cleanit()">Clean it!</button>
+
+
+
+    </div>
+
+    <script>
+
+        // 創建一個9x9的數獨矩陣，0表示空白格
+        const sudokuBoard = [
+            [0, 0, 0, 5, 0, 0, 0, 0, 4],
+            [0, 0, 0, 0, 2, 0, 1, 8, 0],
+            [0, 0, 5, 0, 7, 0, 0, 0, 2],
+            [0, 0, 0, 0, 3, 2, 0, 0, 0],
+            [2, 0, 0, 1, 0, 0, 7, 5, 3],
+            [0, 0, 0, 7, 4, 0, 0, 0, 0],
+            [6, 7, 0, 9, 8, 0, 0, 0, 1],
+            [0, 0, 1, 0, 0, 0, 0, 4, 9],
+            [0, 4, 9, 0, 0, 3, 0, 0, 0]
+        ];
+        // const sudokuBoard = [
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        // ];
+
+        // 檢查某個數字是否可以放在指定位置
+        function isValidMove(board, row, col, num) {
+            // 檢查行和列
+            for (let i = 0; i < 9; i++) {
+                if (board[row][i] === num || board[i][col] === num) {
+                    return false;
+                }
+            }
+
+            // 檢查3x3區域
+            const startRow = Math.floor(row / 3) * 3;
+            const startCol = Math.floor(col / 3) * 3;
+            for (let i = startRow; i < startRow + 3; i++) {
+                for (let j = startCol; j < startCol + 3; j++) {
+                    if (board[i][j] === num) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+        // 解數獨
+        function solveSudoku(board) {
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    if (board[row][col] === 0) {
+                        for (let num = 1; num <= 9; num++) {
+                            if (isValidMove(board, row, col, num)) {
+                                board[row][col] = num;
+                                // console.log(row,col,num);
+                                if (solveSudoku(board)) {
+                                    let input = document.getElementById(`${row}${col}`);
+                                    input.value = num;
+                                    color = color + 3;
+                                    input.style.backgroundColor = `rgb(255, ${color}, ${color})`;
+                                    // drawBoard(sudokuBoard, row, col);
+                                    // console.log(color);
+                                    return true;
+                                }
+                                board[row][col] = 0;
+                            }
+                        }
+                        return false;
+                    }
+                }
+
+            }
+            return true;
+        }
+        function drawBoard(board) {
+            let boarddiv = document.getElementById('board');
+            boarddiv.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                let div = document.createElement('div');
+                for (let j = 0; j < 9; j++) {
+                    let input = document.createElement('input')
+                    input.type = `text`;
+                    input.autocomplete = "off";
+                    if (board[i][j] != 0)
+                        input.value = `${board[i][j]}`;
+                    else
+                        input.value = ``;
+                    input.style.width = `40px`;
+                    input.id = `${i}${j}`;
+                    if (j != 0 && j % 3 == 0)
+                        input.style.marginLeft = `10px`;
+
+                    div.appendChild(input);
+                }
+                if (i != 0 && i % 3 == 0) {
+                    let blank = document.createElement('div');
+                    blank.style.marginTop = '10px'
+                    boarddiv.appendChild(blank);
+                }
+                boarddiv.appendChild(div);
+            }
+            console.log(board);
+
+        }
+
+        function modBoard() {
+            let inputs = document.querySelectorAll('#board div input');
+            inputs.forEach(element => {
+                row = element.id.charAt(0);
+                col = element.id.charAt(1);
+                if (element.value == "")
+                    sudokuBoard[row][col] = 0;
+                else {
+                    val = parseInt(element.value);
+                    sudokuBoard[row][col] = val;
+
+                }
+            });
+        }
+        let con=()=>{
+            let inputs = document.querySelectorAll('#board div input');
+            inputs.forEach(element => {
+                element.style.backgroundColor = "rgb(255,255,255)";
+            });
+        }
+        let Cleanit=()=>{
+            let inputs = document.querySelectorAll('#board div input');
+            inputs.forEach(element => {
+                element.style.backgroundColor = "rgb(255,255,255)";
+                element.value = "";
+            });
+        }
+
+        function Solveit() {
+            color = 1;
+            modBoard();
+            con();
+            solveSudoku(sudokuBoard);
+        }
+
+        color = 1;
+
+        // 執行解數獨
+        drawBoard(sudokuBoard);
+        // solveSudoku(sudokuBoard);
+
+
+
+        // 打印解答
+        // console.log(sudokuBoard);
+
+
+
+
+    </script>
+
+</body>
+
+</html>
